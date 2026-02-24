@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("AHORROS")
 public class CuentaDeAhorros extends Cuenta {
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private double saldo;
 
     public CuentaDeAhorros() {
