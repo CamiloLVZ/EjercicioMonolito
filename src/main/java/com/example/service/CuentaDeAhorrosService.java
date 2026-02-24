@@ -1,16 +1,17 @@
 package com.example.service;
 
 import com.example.entity.CuentaDeAhorros;
+import com.example.persistence.CuentaRepository;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
 public class CuentaDeAhorrosService {
 
-    private final EntityManager entityManager;
+    private final CuentaRepository cuentaRepository;
 
     public CuentaDeAhorrosService(EntityManager entityManager) {
-        this.entityManager = entityManager;
+        this.cuentaRepository = new CuentaRepository(entityManager);
     }
 
     public void crearCuenta(CuentaDeAhorros cuenta) {
@@ -18,23 +19,15 @@ public class CuentaDeAhorrosService {
             System.out.println("Cuenta inválida");
             return;
         }
-        entityManager.persist(cuenta);
+        cuentaRepository.saveAhorros(cuenta);
     }
 
     public CuentaDeAhorros buscarPorNumero(String numeroCuenta) {
-        List<CuentaDeAhorros> resultado = entityManager
-                .createQuery("SELECT c FROM CuentaDeAhorros c WHERE c.numeroCuenta = :numero", CuentaDeAhorros.class)
-                .setParameter("numero", numeroCuenta)
-                .setMaxResults(1)
-                .getResultList();
-
-        return resultado.isEmpty() ? null : resultado.getFirst();
+        return cuentaRepository.findAhorrosByNumero(numeroCuenta);
     }
 
     public List<CuentaDeAhorros> listarCuentas() {
-        return entityManager
-                .createQuery("SELECT c FROM CuentaDeAhorros c", CuentaDeAhorros.class)
-                .getResultList();
+        return cuentaRepository.findAllAhorros();
     }
 
     public void eliminarCuenta(String numeroCuenta) {
@@ -43,6 +36,6 @@ public class CuentaDeAhorrosService {
             System.out.println("Cuenta no encontrada");
             return;
         }
-        entityManager.remove(cuenta);
+        cuentaRepository.deleteAhorros(cuenta);
     }
 }

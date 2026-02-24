@@ -1,11 +1,11 @@
 package com.example.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "cuentas_credito")
+@DiscriminatorValue("CREDITO")
 public class CuentaDeCredito extends Cuenta {
 
     @Column(nullable = false)

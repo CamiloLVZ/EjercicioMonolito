@@ -3,45 +3,47 @@ package com.example.service;
 import com.example.entity.Cliente;
 import com.example.entity.CuentaDeAhorros;
 import com.example.entity.CuentaDeCredito;
+import com.example.persistence.ClienteRepository;
+import com.example.persistence.CuentaRepository;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
 
 public class CuentaService {
 
-    private final EntityManager entityManager;
+    private final ClienteRepository clienteRepository;
+    private final CuentaRepository cuentaRepository;
 
     public CuentaService(EntityManager entityManager) {
-        this.entityManager = entityManager;
+        this.clienteRepository = new ClienteRepository(entityManager);
+        this.cuentaRepository = new CuentaRepository(entityManager);
     }
 
     public CuentaDeAhorros crearCuentaDeAhorros(Long clienteId, String numeroCuenta, double saldoInicial) {
         Cliente titular = buscarCliente(clienteId);
         CuentaDeAhorros cuenta = new CuentaDeAhorros(numeroCuenta, titular, saldoInicial);
-        entityManager.persist(cuenta);
-        return cuenta;
+        return cuentaRepository.saveAhorros(cuenta);
     }
 
     public CuentaDeCredito crearCuentaDeCredito(Long clienteId, String numeroCuenta, double cupoTotal) {
         Cliente titular = buscarCliente(clienteId);
         CuentaDeCredito cuenta = new CuentaDeCredito(numeroCuenta, titular, cupoTotal);
-        entityManager.persist(cuenta);
-        return cuenta;
+        return cuentaRepository.saveCredito(cuenta);
     }
 
     public boolean depositar(String numeroCuenta, double valor) {
-        CuentaDeAhorros cuenta = buscarCuentaAhorrosPorNumero(numeroCuenta);
+        CuentaDeAhorros cuenta = cuentaRepository.findAhorrosByNumero(numeroCuenta);
         return cuenta != null && cuenta.depositar(valor);
     }
 
     public boolean retirar(String numeroCuenta, double valor) {
-        CuentaDeAhorros cuenta = buscarCuentaAhorrosPorNumero(numeroCuenta);
+        CuentaDeAhorros cuenta = cuentaRepository.findAhorrosByNumero(numeroCuenta);
         return cuenta != null && cuenta.retirar(valor);
     }
 
     public boolean transferir(String origen, String destino, double valor) {
-        CuentaDeAhorros cuentaOrigen = buscarCuentaAhorrosPorNumero(origen);
-        CuentaDeAhorros cuentaDestino = buscarCuentaAhorrosPorNumero(destino);
+        CuentaDeAhorros cuentaOrigen = cuentaRepository.findAhorrosByNumero(origen);
+        CuentaDeAhorros cuentaDestino = cuentaRepository.findAhorrosByNumero(destino);
 
         if (cuentaOrigen == null || cuentaDestino == null) {
             return false;
@@ -51,49 +53,25 @@ public class CuentaService {
     }
 
     public boolean retirarAvanceCredito(String numeroCuentaCredito, double valor) {
-        CuentaDeCredito cuenta = buscarCuentaCreditoPorNumero(numeroCuentaCredito);
+        CuentaDeCredito cuenta = cuentaRepository.findCreditoByNumero(numeroCuentaCredito);
         return cuenta != null && cuenta.retirarAvance(valor);
     }
 
     public boolean abonarDeudaCredito(String numeroCuentaCredito, double valor) {
-        CuentaDeCredito cuenta = buscarCuentaCreditoPorNumero(numeroCuentaCredito);
+        CuentaDeCredito cuenta = cuentaRepository.findCreditoByNumero(numeroCuentaCredito);
         return cuenta != null && cuenta.abonarDeuda(valor);
     }
 
     public List<CuentaDeAhorros> listarCuentasAhorros() {
-        return entityManager
-                .createQuery("SELECT c FROM CuentaDeAhorros c ORDER BY c.id", CuentaDeAhorros.class)
-                .getResultList();
+        return cuentaRepository.findAllAhorros();
     }
 
     public List<CuentaDeCredito> listarCuentasCredito() {
-        return entityManager
-                .createQuery("SELECT c FROM CuentaDeCredito c ORDER BY c.id", CuentaDeCredito.class)
-                .getResultList();
-    }
-
-    public CuentaDeAhorros buscarCuentaAhorrosPorNumero(String numeroCuenta) {
-        List<CuentaDeAhorros> resultado = entityManager
-                .createQuery("SELECT c FROM CuentaDeAhorros c WHERE c.numeroCuenta = :numero", CuentaDeAhorros.class)
-                .setParameter("numero", numeroCuenta)
-                .setMaxResults(1)
-                .getResultList();
-
-        return resultado.isEmpty() ? null : resultado.getFirst();
-    }
-
-    public CuentaDeCredito buscarCuentaCreditoPorNumero(String numeroCuenta) {
-        List<CuentaDeCredito> resultado = entityManager
-                .createQuery("SELECT c FROM CuentaDeCredito c WHERE c.numeroCuenta = :numero", CuentaDeCredito.class)
-                .setParameter("numero", numeroCuenta)
-                .setMaxResults(1)
-                .getResultList();
-
-        return resultado.isEmpty() ? null : resultado.getFirst();
+        return cuentaRepository.findAllCredito();
     }
 
     private Cliente buscarCliente(Long clienteId) {
-        Cliente titular = entityManager.find(Cliente.class, clienteId);
+        Cliente titular = clienteRepository.findById(clienteId);
         if (titular == null) {
             throw new IllegalArgumentException("No existe el cliente con id " + clienteId);
         }
