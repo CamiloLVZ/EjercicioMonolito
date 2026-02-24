@@ -25,34 +25,34 @@ public class CuentaRepository {
     }
 
     public CuentaDeAhorros findAhorrosByNumero(String numeroCuenta) {
-        List<CuentaDeAhorros> resultado = entityManager
-                .createQuery("SELECT c FROM CuentaDeAhorros c WHERE c.numeroCuenta = :numero", CuentaDeAhorros.class)
+        List resultado = entityManager
+                .createQuery("SELECT c FROM CuentaDeAhorros c WHERE c.numeroCuenta = :numero")
                 .setParameter("numero", numeroCuenta)
                 .setMaxResults(1)
                 .getResultList();
 
-        return resultado.isEmpty() ? null : resultado.getFirst();
+        return resultado.isEmpty() ? null : (CuentaDeAhorros) resultado.get(0);
     }
 
     public CuentaDeCredito findCreditoByNumero(String numeroCuenta) {
-        List<CuentaDeCredito> resultado = entityManager
-                .createQuery("SELECT c FROM CuentaDeCredito c WHERE c.numeroCuenta = :numero", CuentaDeCredito.class)
+        List resultado = entityManager
+                .createQuery("SELECT c FROM CuentaDeCredito c WHERE c.numeroCuenta = :numero")
                 .setParameter("numero", numeroCuenta)
                 .setMaxResults(1)
                 .getResultList();
 
-        return resultado.isEmpty() ? null : resultado.getFirst();
+        return resultado.isEmpty() ? null : (CuentaDeCredito) resultado.get(0);
     }
 
-    public List<CuentaDeAhorros> findAllAhorros() {
+    public List findAllAhorros() {
         return entityManager
-                .createQuery("SELECT c FROM CuentaDeAhorros c ORDER BY c.id", CuentaDeAhorros.class)
+                .createQuery("SELECT c FROM CuentaDeAhorros c ORDER BY c.id")
                 .getResultList();
     }
 
-    public List<CuentaDeCredito> findAllCredito() {
+    public List findAllCredito() {
         return entityManager
-                .createQuery("SELECT c FROM CuentaDeCredito c ORDER BY c.id", CuentaDeCredito.class)
+                .createQuery("SELECT c FROM CuentaDeCredito c ORDER BY c.id")
                 .getResultList();
     }
 

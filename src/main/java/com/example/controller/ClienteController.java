@@ -32,7 +32,7 @@ public class ClienteController {
         }
     }
 
-    public List<Cliente> listarClientes() {
+    public List listarClientes() {
         EntityManager em = entityManagerFactory.createEntityManager();
         try {
             return new ClienteService(em).listarClientes();

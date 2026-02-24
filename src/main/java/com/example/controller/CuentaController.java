@@ -17,56 +17,44 @@ public class CuentaController {
     }
 
     public CuentaDeAhorros crearCuentaAhorros(Long clienteId, String numeroCuenta, double saldoInicial) {
-        return ejecutarEnTransaccion(em -> new CuentaService(em).crearCuentaDeAhorros(clienteId, numeroCuenta, saldoInicial));
-    }
-
-    public CuentaDeCredito crearCuentaCredito(Long clienteId, String numeroCuenta, double cupoTotal) {
-        return ejecutarEnTransaccion(em -> new CuentaService(em).crearCuentaDeCredito(clienteId, numeroCuenta, cupoTotal));
-    }
-
-    public boolean depositar(String numeroCuenta, double valor) {
-        return ejecutarEnTransaccion(em -> new CuentaService(em).depositar(numeroCuenta, valor));
-    }
-
-    public boolean retirar(String numeroCuenta, double valor) {
-        return ejecutarEnTransaccion(em -> new CuentaService(em).retirar(numeroCuenta, valor));
-    }
-
-    public boolean transferir(String origen, String destino, double valor) {
-        return ejecutarEnTransaccion(em -> new CuentaService(em).transferir(origen, destino, valor));
-    }
-
-    public boolean retirarAvanceCredito(String numeroCuenta, double valor) {
-        return ejecutarEnTransaccion(em -> new CuentaService(em).retirarAvanceCredito(numeroCuenta, valor));
-    }
-
-    public boolean abonarDeudaCredito(String numeroCuenta, double valor) {
-        return ejecutarEnTransaccion(em -> new CuentaService(em).abonarDeudaCredito(numeroCuenta, valor));
-    }
-
-    public List<CuentaDeAhorros> listarCuentasAhorros() {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        try {
-            return new CuentaService(em).listarCuentasAhorros();
-        } finally {
-            em.close();
-        }
-    }
-
-    public List<CuentaDeCredito> listarCuentasCredito() {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        try {
-            return new CuentaService(em).listarCuentasCredito();
-        } finally {
-            em.close();
-        }
-    }
-
-    private <T> T ejecutarEnTransaccion(Operacion<T> operacion) {
         EntityManager em = entityManagerFactory.createEntityManager();
         try {
             em.getTransaction().begin();
-            T resultado = operacion.ejecutar(em);
+            CuentaDeAhorros cuenta = new CuentaService(em).crearCuentaDeAhorros(clienteId, numeroCuenta, saldoInicial);
+            em.getTransaction().commit();
+            return cuenta;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public CuentaDeCredito crearCuentaCredito(Long clienteId, String numeroCuenta, double cupoTotal) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            CuentaDeCredito cuenta = new CuentaService(em).crearCuentaDeCredito(clienteId, numeroCuenta, cupoTotal);
+            em.getTransaction().commit();
+            return cuenta;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean depositar(String numeroCuenta, double valor) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            boolean resultado = new CuentaService(em).depositar(numeroCuenta, valor);
             em.getTransaction().commit();
             return resultado;
         } catch (Exception e) {
@@ -79,8 +67,89 @@ public class CuentaController {
         }
     }
 
-    @FunctionalInterface
-    private interface Operacion<T> {
-        T ejecutar(EntityManager em);
+    public boolean retirar(String numeroCuenta, double valor) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            boolean resultado = new CuentaService(em).retirar(numeroCuenta, valor);
+            em.getTransaction().commit();
+            return resultado;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean transferir(String origen, String destino, double valor) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            boolean resultado = new CuentaService(em).transferir(origen, destino, valor);
+            em.getTransaction().commit();
+            return resultado;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean retirarAvanceCredito(String numeroCuenta, double valor) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            boolean resultado = new CuentaService(em).retirarAvanceCredito(numeroCuenta, valor);
+            em.getTransaction().commit();
+            return resultado;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean abonarDeudaCredito(String numeroCuenta, double valor) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            boolean resultado = new CuentaService(em).abonarDeudaCredito(numeroCuenta, valor);
+            em.getTransaction().commit();
+            return resultado;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    public List listarCuentasAhorros() {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            return new CuentaService(em).listarCuentasAhorros();
+        } finally {
+            em.close();
+        }
+    }
+
+    public List listarCuentasCredito() {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        try {
+            return new CuentaService(em).listarCuentasCredito();
+        } finally {
+            em.close();
+        }
     }
 }

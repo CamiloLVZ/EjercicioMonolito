@@ -26,7 +26,7 @@ public class CuentaDeAhorrosService {
         return cuentaRepository.findAhorrosByNumero(numeroCuenta);
     }
 
-    public List<CuentaDeAhorros> listarCuentas() {
+    public List listarCuentas() {
         return cuentaRepository.findAllAhorros();
     }
 

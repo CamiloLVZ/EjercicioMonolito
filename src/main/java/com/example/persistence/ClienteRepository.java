@@ -22,9 +22,9 @@ public class ClienteRepository {
         return entityManager.find(Cliente.class, id);
     }
 
-    public List<Cliente> findAll() {
+    public List findAll() {
         return entityManager
-                .createQuery("SELECT c FROM Cliente c ORDER BY c.id", Cliente.class)
+                .createQuery("SELECT c FROM Cliente c ORDER BY c.id")
                 .getResultList();
     }
 }

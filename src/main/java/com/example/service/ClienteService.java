@@ -23,7 +23,7 @@ public class ClienteService {
         return clienteRepository.findById(id);
     }
 
-    public List<Cliente> listarClientes() {
+    public List listarClientes() {
         return clienteRepository.findAll();
     }
 }

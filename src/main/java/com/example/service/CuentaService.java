@@ -62,11 +62,11 @@ public class CuentaService {
         return cuenta != null && cuenta.abonarDeuda(valor);
     }
 
-    public List<CuentaDeAhorros> listarCuentasAhorros() {
+    public List listarCuentasAhorros() {
         return cuentaRepository.findAllAhorros();
     }
 
-    public List<CuentaDeCredito> listarCuentasCredito() {
+    public List listarCuentasCredito() {
         return cuentaRepository.findAllCredito();
     }
 
