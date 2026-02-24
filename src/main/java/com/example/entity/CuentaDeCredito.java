@@ -1,9 +1,21 @@
 package com.example.entity;
 
-public class CuentaDeCredito extends Cuenta{
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
-    private final double cupoTotal;
+@Entity
+@Table(name = "cuentas_credito")
+public class CuentaDeCredito extends Cuenta {
+
+    @Column(nullable = false)
+    private double cupoTotal;
+
+    @Column(nullable = false)
     private double deudaActual;
+
+    public CuentaDeCredito() {
+    }
 
     public CuentaDeCredito(String numeroCuenta, Cliente titular, double cupoTotal) {
         super(numeroCuenta, titular);
@@ -11,12 +23,12 @@ public class CuentaDeCredito extends Cuenta{
         this.deudaActual = 0;
     }
 
-    public boolean retirarAvance(double valor){
-        if(valor<=0){
+    public boolean retirarAvance(double valor) {
+        if (valor <= 0) {
             System.out.println("El valor a retirar debe ser positivo");
             return false;
         }
-        if(valor+deudaActual>cupoTotal){
+        if (valor + deudaActual > cupoTotal) {
             System.out.println("Cupo insuficiente para avance");
             return false;
         }
@@ -24,13 +36,13 @@ public class CuentaDeCredito extends Cuenta{
         return true;
     }
 
-    public boolean abonarDeuda(double valor){
-        if(valor<=0){
+    public boolean abonarDeuda(double valor) {
+        if (valor <= 0) {
             System.out.println("El valor a abonar debe ser positivo");
             return false;
         }
 
-        if(valor>deudaActual){
+        if (valor > deudaActual) {
             System.out.println("El valor no puede ser mayor a la deuda");
             return false;
         }
@@ -43,8 +55,15 @@ public class CuentaDeCredito extends Cuenta{
         return cupoTotal;
     }
 
+    public void setCupoTotal(double cupoTotal) {
+        this.cupoTotal = cupoTotal;
+    }
+
     public double getDeudaActual() {
         return deudaActual;
     }
 
+    public void setDeudaActual(double deudaActual) {
+        this.deudaActual = deudaActual;
+    }
 }

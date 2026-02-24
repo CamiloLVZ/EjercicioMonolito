@@ -1,48 +1,48 @@
 package com.example.service;
 
 import com.example.entity.CuentaDeAhorros;
+import jakarta.persistence.EntityManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CuentaDeAhorrosService {
 
+    private final EntityManager entityManager;
 
-    private List<CuentaDeAhorros> cuentas = new ArrayList<>();
+    public CuentaDeAhorrosService(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
-    // CREATE
     public void crearCuenta(CuentaDeAhorros cuenta) {
         if (cuenta == null) {
             System.out.println("Cuenta inválida");
             return;
         }
-        cuentas.add(cuenta);
+        entityManager.persist(cuenta);
     }
 
-    // READ (por número de cuenta)
     public CuentaDeAhorros buscarPorNumero(String numeroCuenta) {
-        for (CuentaDeAhorros c : cuentas) {
-            if (c.getNumeroCuenta().equals(numeroCuenta)) {
-                return c;
-            }
-        }
-        return null;
+        List<CuentaDeAhorros> resultado = entityManager
+                .createQuery("SELECT c FROM CuentaDeAhorros c WHERE c.numeroCuenta = :numero", CuentaDeAhorros.class)
+                .setParameter("numero", numeroCuenta)
+                .setMaxResults(1)
+                .getResultList();
+
+        return resultado.isEmpty() ? null : resultado.getFirst();
     }
 
-    // READ (todas)
     public List<CuentaDeAhorros> listarCuentas() {
-        return cuentas;
+        return entityManager
+                .createQuery("SELECT c FROM CuentaDeAhorros c", CuentaDeAhorros.class)
+                .getResultList();
     }
 
-
-    // DELETE
     public void eliminarCuenta(String numeroCuenta) {
-        CuentaDeAhorros c = buscarPorNumero(numeroCuenta);
-        if (c == null) {
+        CuentaDeAhorros cuenta = buscarPorNumero(numeroCuenta);
+        if (cuenta == null) {
             System.out.println("Cuenta no encontrada");
             return;
         }
-        cuentas.remove(c);
+        entityManager.remove(cuenta);
     }
-
 }

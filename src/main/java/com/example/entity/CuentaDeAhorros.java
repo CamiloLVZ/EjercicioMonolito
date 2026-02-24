@@ -1,8 +1,18 @@
 package com.example.entity;
 
-public class CuentaDeAhorros extends Cuenta{
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "cuentas_ahorros")
+public class CuentaDeAhorros extends Cuenta {
+
+    @Column(nullable = false)
     private double saldo;
+
+    public CuentaDeAhorros() {
+    }
 
     public CuentaDeAhorros(String numeroCuenta, Cliente titular, double saldo) {
         super(numeroCuenta, titular);
@@ -10,7 +20,7 @@ public class CuentaDeAhorros extends Cuenta{
     }
 
     public boolean depositar(double valor) {
-        if(valor<=0) {
+        if (valor <= 0) {
             System.out.println("El valor a depositar debe ser positivo");
             return false;
         }
@@ -20,11 +30,11 @@ public class CuentaDeAhorros extends Cuenta{
     }
 
     public boolean retirar(double valor) {
-        if(valor<=0) {
+        if (valor <= 0) {
             System.out.println("El valor a retirar debe ser positivo");
             return false;
         }
-        if(this.saldo<valor){
+        if (this.saldo < valor) {
             System.out.println("Saldo insuficiente para retiro");
             return false;
         }
@@ -34,8 +44,12 @@ public class CuentaDeAhorros extends Cuenta{
     }
 
     public boolean transferir(double valor, CuentaDeAhorros cuentaDestino) {
-        if(valor<=0) {
+        if (valor <= 0) {
             System.out.println("El valor a transferir debe ser positivo");
+            return false;
+        }
+        if (this.saldo < valor) {
+            System.out.println("Saldo insuficiente para transferencia");
             return false;
         }
 
@@ -44,4 +58,11 @@ public class CuentaDeAhorros extends Cuenta{
         return true;
     }
 
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(double saldo) {
+        this.saldo = saldo;
+    }
 }
