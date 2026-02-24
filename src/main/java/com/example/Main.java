@@ -1,35 +1,34 @@
 package com.example;
 
+import com.example.config.JpaUtil;
+import com.example.controller.ClienteController;
+import com.example.controller.CuentaController;
 import com.example.entity.Cliente;
-import com.example.entity.CuentaDeAhorros;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 
 public class Main {
     public static void main(String[] args) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("miPU");
-        EntityManager em = emf.createEntityManager();
+        ClienteController clienteController = new ClienteController(JpaUtil.getEntityManagerFactory());
+        CuentaController cuentaController = new CuentaController(JpaUtil.getEntityManagerFactory());
 
         try {
-            em.getTransaction().begin();
+            Cliente cliente1 = clienteController.crearCliente("Ana Torres", "CC-1001");
+            Cliente cliente2 = clienteController.crearCliente("Luis Díaz", "CC-1002");
 
-            Cliente cliente = new Cliente("Ana Torres", "CC-1001");
-            em.persist(cliente);
+            cuentaController.crearCuentaAhorros(cliente1.getId(), "AHO-0001", 500_000);
+            cuentaController.crearCuentaAhorros(cliente2.getId(), "AHO-0002", 300_000);
+            cuentaController.crearCuentaCredito(cliente1.getId(), "CRE-0001", 2_000_000);
 
-            CuentaDeAhorros cuenta = new CuentaDeAhorros("AHO-0001", cliente, 500_000);
-            em.persist(cuenta);
+            cuentaController.depositar("AHO-0001", 100_000);
+            cuentaController.transferir("AHO-0001", "AHO-0002", 150_000);
+            cuentaController.retirarAvanceCredito("CRE-0001", 200_000);
 
-            em.getTransaction().commit();
-            System.out.println("Datos de prueba guardados correctamente en MySQL.");
+            System.out.println("Clientes registrados: " + clienteController.listarClientes().size());
+            System.out.println("Cuentas de ahorro registradas: " + cuentaController.listarCuentasAhorros().size());
+            System.out.println("Cuentas de crédito registradas: " + cuentaController.listarCuentasCredito().size());
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            System.err.println("No fue posible guardar los datos: " + e.getMessage());
+            System.err.println("Error ejecutando operaciones: " + e.getMessage());
         } finally {
-            em.close();
-            emf.close();
+            JpaUtil.close();
         }
     }
 }
